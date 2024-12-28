@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Festive Bible Reading Tracker</title>
+  <style>
+    /* 
+      Use the local image: autumn-wallpaper-picjumbo-com.jpg
+      Must be in the same folder as this HTML file for the path to work directly.
+    */
+    body {
+      background: url('autumn-wallpaper-picjumbo-com.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    /* A semi-transparent overlay to keep text and tiles readable. */
+    #overlay {
+      background-color: rgba(255, 255, 255, 0.5);
+      padding: 20px;
+      margin: 0 auto;
+      max-width: 900px;
+      border-radius: 10px;
+    }
+
+    h1, h2 {
+      color: #000; /* Dark text on the lighter overlay */
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .legend {
+      margin: 15px 0;
+      text-align: center;
+      color: #000;
+    }
+
+    .legend span {
+      display: inline-block;
+      margin: 0 10px;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+
+    .not-read {
+      background: #ffffffcc;
+      color: #333;
+    }
+
+    .read-legend {
+      background: #c7f9cc;
+      color: #333;
+      text-decoration: line-through;
+    }
+
+    /* Container for the book “cards” */
+    .book-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    /* Smaller cards so you can see more at once */
+    .book {
+      width: 85px;
+      background-color: #ffffffcc;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      margin: 3px;
+      padding: 3px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.75em;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .book:hover {
+      background-color: #e0ebf9;
+      transform: scale(1.02);
+    }
+
+    .book.read {
+      background-color: #c7f9cc; 
+      text-decoration: line-through;
+      color: #444;
+    }
+
+    @media (max-width: 600px) {
+      .book {
+        width: 70px;
+        margin: 2px;
+        padding: 2px;
+        font-size: 0.65em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <h1>Festive Bible Reading Tracker</h1>
+    <h2>Click on a Book to Toggle Read/Unread</h2>
+
+    <div class="legend">
+      <span class="not-read">Not Read</span>
+      <span class="read-legend">Read</span>
+    </div>
+
+    <div class="book-list" id="bookList">
+      <!-- JavaScript will populate book “cards” here -->
+    </div>
+  </div>
+
+  <script>
+    // List of all 66 Bible books in (Protestant) canonical order
+    const allBibleBooks = [
+      "Genesis","Exodus","Leviticus","Numbers","Deuteronomy",
+      "Joshua","Judges","Ruth","1 Samuel","2 Samuel",
+      "1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
+      "Nehemiah","Esther","Job","Psalms","Proverbs",
+      "Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations",
+      "Ezekiel","Daniel","Hosea","Joel","Amos",
+      "Obadiah","Jonah","Micah","Nahum","Habakkuk",
+      "Zephaniah","Haggai","Zechariah","Malachi",
+      "Matthew","Mark","Luke","John","Acts",
+      "Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians",
+      "Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy",
+      "2 Timothy","Titus","Philemon","Hebrews","James",
+      "1 Peter","2 Peter","1 John","2 John","3 John",
+      "Jude","Revelation"
+    ];
+
+    // The books you've read so far
+    const userReadBooks = [
+      "Psalms", "Proverbs", "Isaiah", "1 John", "2 John", "3 John",
+      "1 Peter", "2 Peter", "James", "Colossians", "Philippians",
+      "Ephesians", "Luke", "2 Corinthians", "1 Corinthians",
+      "Romans", "John"
+    ];
+
+    // Load read status from localStorage
+    let savedReadBooks = JSON.parse(localStorage.getItem("readBooks")) || [];
+
+    // Ensure our known read books are included in savedReadBooks
+    userReadBooks.forEach(book => {
+      if (!savedReadBooks.includes(book)) {
+        savedReadBooks.push(book);
+      }
+    });
+
+    // Save readBooks array to localStorage
+    function saveReadBooks() {
+      localStorage.setItem("readBooks", JSON.stringify(savedReadBooks));
+    }
+
+    // Toggle read/unread when a book is clicked
+    function toggleBook(bookName) {
+      const index = savedReadBooks.indexOf(bookName);
+      if (index === -1) {
+        savedReadBooks.push(bookName);
+      } else {
+        savedReadBooks.splice(index, 1);
+      }
+      saveReadBooks();
+      renderBooks();
+    }
+
+    // Create the “cards” for each book & attach event handlers
+    function renderBooks() {
+      const bookList = document.getElementById("bookList");
+      bookList.innerHTML = "";
+
+      allBibleBooks.forEach(book => {
+        const bookDiv = document.createElement("div");
+        bookDiv.className = "book" + (savedReadBooks.includes(book) ? " read" : "");
+        bookDiv.textContent = book;
+        bookDiv.onclick = () => toggleBook(book);
+        bookList.appendChild(bookDiv);
+      });
+    }
+
+    // Render the initial state on page load
+    renderBooks();
+  </script>
+</body>
+</html>
